@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { closeModal, picturesSelector, selectPicture, getSelectedPicture} from '../reducer';
 import ModalPortal from './modal';
+import { isSome, Option } from 'fp-ts/lib/Option';
+import { Picture } from '../types/picture.type';
 
 const Container = styled.div`
   padding: 1rem;
@@ -22,7 +24,7 @@ const Image = styled.img`
 `;
 const Pictures = () => {
   const pictures = useSelector(picturesSelector); // Récupère les images depuis Redux
-  const selectedPicture = useSelector(getSelectedPicture);
+  const selectedPicture: Option<Picture> = useSelector(getSelectedPicture);
   const dispatch = useDispatch();
 
   return (
@@ -32,10 +34,10 @@ const Pictures = () => {
         <Image key={index} src={picture.previewFormat} alt={`Image ${index}`}  onClick={() => dispatch(selectPicture(picture))}/>
       ))}
     </Container>
-    {selectedPicture !== null && (
+    {isSome(selectedPicture) && (
         <ModalPortal
-        largeFormat={selectedPicture.largeFormat} 
-        author={selectedPicture.author}
+        largeFormat={selectedPicture.value.largeFormat}
+          author={selectedPicture.value.author}
         close={() => dispatch(closeModal())} 
         />
       )}

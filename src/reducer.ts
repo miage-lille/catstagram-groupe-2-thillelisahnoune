@@ -3,17 +3,20 @@ import { compose } from 'redux';
 import { Actions } from './types/actions.type';
 import { Picture } from './types/picture.type';
 import fakeData from './fake-datas.json';
+import { none, Option, some } from 'fp-ts/lib/Option';
 
 export type State = {
   counter: number,
   pictures: Picture[];
-  selectedPicture: Picture | null; 
+  // selectedPicture: Picture | null; 
+  selectedPicture: Option<Picture>;
 } // TODO : Update this type !
 
 export const defaultState = {
   counter: 3,
   pictures: fakeData.slice(0, 3),
-  selectedPicture: null,
+  // selectedPicture: null,
+  selectedPicture: none,
 } // TODO : Update this value !
 
 type Increment = { type: 'INCREMENT' };
@@ -29,9 +32,10 @@ type CloseModal = { type: 'CLOSE_MODAL' };
     return { type: 'DECREMENT' };
   };
 
-  export const selectPicture = (picture: Picture): SelectPicture => ({
+  export const selectPicture = (picture: Picture): Actions => ({
     type: 'SELECT_PICTURE',
-    payload: picture,
+    // payload: picture,
+    payload: some(picture),
   });
   
   export const closeModal = (): CloseModal => ({
@@ -54,7 +58,7 @@ export const reducer = (state: State | undefined, action: Actions): State | Loop
       return { ...state, selectedPicture: action.payload,
       };
     case 'CLOSE_MODAL':
-      return { ...state, selectedPicture: null, 
+      return { ...state, selectedPicture: none, 
       };
     case 'FETCH_CATS_REQUEST':
       throw 'Not Implemented';
@@ -73,7 +77,7 @@ export const counterSelector = (state: State) => {
 export const picturesSelector = (state: State) => {
   return state.pictures;
 };
-export const getSelectedPicture = (state: State) => {
+export const getSelectedPicture = (state: State): Option<Picture> => {
   return state.selectedPicture;
 };
 
