@@ -1,5 +1,10 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { closeModal, picturesSelector, selectPicture, getSelectedPicture} from '../reducer';
+import ModalPortal from './modal';
+import { isSome, Option } from 'fp-ts/lib/Option';
+import { Picture } from '../types/picture.type';
 
 const Container = styled.div`
   padding: 1rem;
@@ -18,7 +23,38 @@ const Image = styled.img`
   }
 `;
 const Pictures = () => {
-  return null;
+  const pictures = useSelector(picturesSelector); // Récupère les images depuis Redux
+  const selectedPicture: Option<Picture> = useSelector(getSelectedPicture);
+  const dispatch = useDispatch();
+
+  return (
+    <div>
+    <Container>
+    {pictures.length > 0 ? (
+    pictures.map((picture, index) => (
+      <Image 
+        key={index} 
+        src={picture.previewFormat} 
+        alt={`Image ${index}`} 
+        onClick={() => dispatch(selectPicture(picture))}
+      />
+    ))
+  ) : (
+    <p> L'API ne répond pas ou bien aucune image n'est trouvée</p> 
+  )}
+    </Container>
+    {isSome(selectedPicture) && (
+        <ModalPortal
+        largeFormat={selectedPicture.value.largeFormat}
+          author={selectedPicture.value.author}
+        close={() => dispatch(closeModal())} 
+        />
+      )}
+    </div>
+
+
+  );
 };
+
 
 export default Pictures;

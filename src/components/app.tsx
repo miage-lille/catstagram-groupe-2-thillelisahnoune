@@ -10,6 +10,11 @@ const App = () => (
       <Counter />
       <Pictures />
       <div>Hello World ! Go to build your Catstagram 💪 !</div>
+      {/* <div>
+        <button> - </button>
+        <span> 0 </span>
+        <button> + </button>
+    </div> */}
     </>
   </Provider>
 );

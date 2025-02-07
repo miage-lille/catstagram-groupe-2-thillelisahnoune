@@ -23,6 +23,11 @@ const Button = styled.button`
   font-size: 40px;
   font-weight: bold;
 `;
+const AuthorText = styled.p`
+  color: white;
+  font-size: 18px;
+  text-align: center;
+`;
 
 const Image = styled.img`
   margin: auto;
@@ -33,21 +38,23 @@ const Image = styled.img`
 
 interface ModalProps {
   largeFormat: string;
+  author: string; 
   close(): void;
 }
 
-const Modal = ({ largeFormat, close }: ModalProps) => {
+const Modal = ({ largeFormat, author, close }: ModalProps) => {
   return (
     <Container>
-      <Image src={largeFormat} />
       <Button onClick={close}>X</Button>
+      <Image src={largeFormat} alt="Image en grand format" />
+      <AuthorText>Auteur de la photo : {author || "unknown"}</AuthorText> 
     </Container>
   );
 };
 
 const portalRoot = document.getElementById('modal');
 
-const ModalPortal = ({ largeFormat, close }: ModalProps) =>
-  portalRoot ? ReactDOM.createPortal(<Modal largeFormat={largeFormat} close={close} />, portalRoot) : null;
+const ModalPortal = ({ largeFormat, author, close }: ModalProps) =>
+  portalRoot ? ReactDOM.createPortal(<Modal largeFormat={largeFormat} author={author}  close={close} />, portalRoot) : null;
 
 export default ModalPortal;

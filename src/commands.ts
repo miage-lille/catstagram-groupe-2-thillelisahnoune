@@ -7,11 +7,17 @@ export const cmdFetch = (action: FetchCatsRequest) =>
     () => {
       return fetch(action.path, {
         method: action.method,
-      }).then(checkStatus);
+      }).then(checkStatus)
+      .then(response => response.json())
+      .then(data => {
+        console.log("🌍 API Response:", data); 
+        if (!data.hits) throw new Error("Aucune image trouvée !");
+        return data.hits; 
+      });
     },
     {
-      successActionCreator: fetchCatsCommit, // (equals to (payload) => fetchCatsCommit(payload))
-      failActionCreator: fetchCatsRollback, // (equals to (error) => fetchCatsCommit(error))
+      successActionCreator: (payload)=> fetchCatsCommit(payload), // (equals to (payload) => fetchCatsCommit(payload))
+      failActionCreator: (error: unknown)=>fetchCatsRollback(error instanceof Error ? error: new Error(String(error))), // (equals to (error) => fetchCatsCommit(error))
     },
   );
 
