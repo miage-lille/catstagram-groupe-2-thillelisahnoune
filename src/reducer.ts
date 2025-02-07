@@ -1,13 +1,17 @@
 import { Loop, liftState } from 'redux-loop';
 import { compose } from 'redux';
 import { Actions } from './types/actions.type';
+import { Picture } from './types/picture.type';
+import fakeData from './fake-datas.json';
 
 export type State = {
   counter: number,
+  pictures: Picture[];
 } // TODO : Update this type !
 
 export const defaultState = {
-  counter: 3
+  counter: 3,
+  pictures: fakeData.slice(0, 3),
 } // TODO : Update this value !
 
 type Increment = { type: 'INCREMENT' };
@@ -25,10 +29,12 @@ export const reducer = (state: State | undefined, action: Actions): State | Loop
   if (!state) return defaultState; // mandatory by redux
   switch (action.type) {
     case 'INCREMENT':
-      return { ...state, counter: state.counter + 1};
+      const newCounter = state.counter + 1;
+      return { ...state, counter: newCounter, pictures: fakeData.slice(0, newCounter),};
     case 'DECREMENT':
       if (state.counter > 3) {
-        return { ...state, counter: state.counter - 1 };
+        const newCounter = state.counter - 1
+        return { ...state, counter: newCounter, pictures: fakeData.slice(0, newCounter), };
       }
       return state;
     case 'SELECT_PICTURE':
@@ -50,7 +56,7 @@ export const counterSelector = (state: State) => {
   return state.counter;
 };
 export const picturesSelector = (state: State) => {
-  throw 'Not Implemented';
+  return state.pictures;
 };
 export const getSelectedPicture = (state: State) => {
   throw 'Not Implemented';
