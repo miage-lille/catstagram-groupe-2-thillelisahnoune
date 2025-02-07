@@ -46,8 +46,8 @@ const Modal = ({ largeFormat, author, close }: ModalProps) => {
   return (
     <Container>
       <Button onClick={close}>X</Button>
-      <Image src={largeFormat}/>
-      <AuthorText>Photo by: {author}</AuthorText> {/* ✅ Affichage de l’auteur */}
+      <Image src={largeFormat} alt="Image en grand format" />
+      <AuthorText>Auteur de la photo : {author || "unknown"}</AuthorText> 
     </Container>
   );
 };

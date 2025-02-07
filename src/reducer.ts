@@ -1,15 +1,18 @@
-import { Loop, liftState } from 'redux-loop';
+import { Cmd, Loop, liftState, loop } from 'redux-loop';
 import { compose } from 'redux';
-import { Actions } from './types/actions.type';
+import { Actions, FetchCatsRequest } from './types/actions.type';
 import { Picture } from './types/picture.type';
 import fakeData from './fake-datas.json';
 import { none, Option, some } from 'fp-ts/lib/Option';
+import { cmdFetch } from './commands';
 
 export type State = {
   counter: number,
   pictures: Picture[];
   // selectedPicture: Picture | null; 
   selectedPicture: Option<Picture>;
+  loading: boolean; 
+  error: string | null; 
 } // TODO : Update this type !
 
 export const defaultState = {
@@ -17,6 +20,8 @@ export const defaultState = {
   pictures: fakeData.slice(0, 3),
   // selectedPicture: null,
   selectedPicture: none,
+  loading: false,
+  error: null,
 } // TODO : Update this value !
 
 type Increment = { type: 'INCREMENT' };
@@ -46,12 +51,26 @@ export const reducer = (state: State | undefined, action: Actions): State | Loop
   if (!state) return defaultState; // mandatory by redux
   switch (action.type) {
     case 'INCREMENT':
-      const newCounter = state.counter + 1;
-      return { ...state, counter: newCounter, pictures: fakeData.slice(0, newCounter),};
+      const newCounter = Math.min(state.counter + 1, 20);
+      return loop(
+        { ...state, counter: newCounter, loading: true },
+        Cmd.action({
+          type: "FETCH_CATS_REQUEST",
+          method: "GET",
+          path: `https://pixabay.com/api/?key=48690032-35edadbfc7e5286b066811191&per_page=${newCounter}&q=cat`,
+        } as FetchCatsRequest)
+      );
     case 'DECREMENT':
       if (state.counter > 3) {
         const newCounter = state.counter - 1
-        return { ...state, counter: newCounter, pictures: fakeData.slice(0, newCounter), };
+        return loop(
+          { ...state, counter: newCounter, loading: true },
+          Cmd.action({
+            type: "FETCH_CATS_REQUEST",
+            method: "GET",
+            path: `https://pixabay.com/api/?key=48690032-35edadbfc7e5286b066811191&per_page=${newCounter}&q=cat`,
+          } as FetchCatsRequest)
+        );
       }
       return state;
     case 'SELECT_PICTURE':
@@ -61,11 +80,19 @@ export const reducer = (state: State | undefined, action: Actions): State | Loop
       return { ...state, selectedPicture: none, 
       };
     case 'FETCH_CATS_REQUEST':
-      throw 'Not Implemented';
+      return loop( { ...state, loading: true, error: null }, cmdFetch(action) 
+      );
     case 'FETCH_CATS_COMMIT':
-      throw 'Not Implemented';
+      return { ...state, 
+        pictures: action.payload.map((pic: any) => ({
+          previewFormat: pic.previewURL, 
+          webFormat: pic.webformatURL, 
+          largeFormat: pic.largeImageURL, 
+          author: pic.user, 
+        })),
+        loading: false  };
     case 'FETCH_CATS_ROLLBACK':
-      throw 'Not Implemented';
+      return { ...state, error: (action.error as Error).message, loading: false };
       default:
         return state;
   }

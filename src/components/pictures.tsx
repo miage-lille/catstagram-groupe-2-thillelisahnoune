@@ -30,9 +30,18 @@ const Pictures = () => {
   return (
     <div>
     <Container>
-      {pictures.map((picture, index) => (
-        <Image key={index} src={picture.previewFormat} alt={`Image ${index}`}  onClick={() => dispatch(selectPicture(picture))}/>
-      ))}
+    {pictures.length > 0 ? (
+    pictures.map((picture, index) => (
+      <Image 
+        key={index} 
+        src={picture.previewFormat} 
+        alt={`Image ${index}`} 
+        onClick={() => dispatch(selectPicture(picture))}
+      />
+    ))
+  ) : (
+    <p> L'API ne répond pas ou bien aucune image n'est trouvée</p> 
+  )}
     </Container>
     {isSome(selectedPicture) && (
         <ModalPortal
